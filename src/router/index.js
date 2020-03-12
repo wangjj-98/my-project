@@ -2,6 +2,8 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import login from "../components/Login.vue";
 import home from "../components/Home.vue";
+import welcome from "../components/Welcome.vue"//为home 组件的子组件
+import users from "../components/user/Users.vue"
 
 Vue.use(VueRouter);
 
@@ -9,7 +11,10 @@ const router = new VueRouter({
   routes: [
     { path: "/", redirect: "/login" },
     { path: "/login", component: login },
-    { path: "/home", component: home }
+    { path: "/home", component: home, redirect:'/welcome', children: [
+      {path:'/welcome',component: welcome},
+      {path:'/users',component:users},
+    ] }
   ]
 });
 //挂载路由导航守卫
