@@ -3,7 +3,9 @@ import VueRouter from "vue-router";
 import login from "../components/Login.vue";
 import home from "../components/Home.vue";
 import welcome from "../components/Welcome.vue"//为home 组件的子组件
-import users from "../components/user/Users.vue"
+import users from "../components/user/Users.vue"//用户管理组件
+import rights from "../components/power/Rights.vue"//权限列表组件
+import roles from '../components/power/Roles.vue'//角色列表组件
 
 Vue.use(VueRouter);
 
@@ -14,6 +16,8 @@ const router = new VueRouter({
     { path: "/home", component: home, redirect:'/welcome', children: [
       {path:'/welcome',component: welcome},
       {path:'/users',component:users},
+      {path:'/rights',component:rights},
+      {path:'/roles',component:roles}
     ] }
   ]
 });

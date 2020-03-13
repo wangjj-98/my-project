@@ -42,9 +42,9 @@
                 <!-- 修改按钮 -->
                  <el-button type="primary" icon="el-icon-edit" circle @click="showDialog(scope.row.id)"></el-button>
                  <!-- 删除按钮 -->
-                 <el-button type="danger" icon="el-icon-delete" circle @click="deleteuser(scope.row.id)"></el-button>
+                 <el-button type="danger" icon="el-icon-delete" circle @click="removeUserById(scope.row.id)"></el-button>
                  <!-- 分配角色按钮 -->
-                   <el-button type="warning" icon="el-icon-setting" circle></el-button> 
+                   <el-button type="warning" icon="el-icon-setting" circle @click="showRoleDialog(scope.row)"></el-button> 
               </template>
             </el-table-column>
           </el-table>
@@ -101,6 +101,26 @@
         <span slot="footer" class="dialog-footer">
         <el-button @click="showEditDialog = false">取 消</el-button>
         <el-button type="primary" @click="editFormChanged(editForm.id)">提交</el-button>
+        </span>
+      </el-dialog>
+      <!-- 分配角色对话框 -->
+      <el-dialog title="角色分配" :visible.sync="setRoleDialogVisible" width="50%">
+       <div>
+         <p>当前的用户: {{userInfo.username}}</p>
+         <p>当前的角色: {{userInfo.role_name}}</p>
+         <p>分配新角色: 
+            <el-select v-model="selectRoleId" placeholder="请选择">
+              <el-option v-for="item in rolesList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id">
+              </el-option>
+            </el-select>
+         </p>
+       </div>
+        <span slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
         </span>
       </el-dialog>
   </div>  
@@ -164,8 +184,17 @@ export default {
           mobile:[
             { required: true, message: '请输入手机号', trigger: 'blur' },
              {validator: checkPhone, trigger: 'blur'}
-          ]
+          ],
        },
+       // 分配角色对话框的显示与隐藏
+          setRoleDialogVisible:false,
+          //需要被分配角色的用户信息
+          userInfo:{},
+          //角色列表信息
+          rolesList:[],
+          //下拉框角色id
+          selectRoleId:''
+
       }
     },
     created() {
@@ -251,13 +280,52 @@ export default {
          }
        )
       },
-      //点击删除按钮 发送请求删除用户
-     async deleteuser(id){
-      const {data:res} =await this.axios.delete(`/users/${id}`)
-      if(res.meta.status !==200) return this.$message.error('删除失败')
-      this.$message.success(res.meta.msg)
-      this.getUserList()
+      //根据id删除对应的用户信息
+     removeUserById(id){
+        //弹框询问用户是否删除
+        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const {data:res} =await this.axios.delete(`/users/${id}`)
+          if(res.meta.status !==200) return this.$message.error('删除失败')
+          this.getUserList()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+        //如果用户确认删除则返回字符串 confirm
+      },
+      //显示分配角色对话框
+     async showRoleDialog(userInfo){
+        this.userInfo=userInfo
+
+        //获取所有的角色列表
+         const {data:res}= await this.axios.get('/roles')
+          if(res.meta.status !== 200) return this.$message.error('获取失败')
+          this.rolesList = res.data
+          this.$message.success('获取角色列表成功')
+        this.setRoleDialogVisible=true
+      },
+      //点击按钮 分配角色
+     async saveRoleInfo(){
+        if(!this.selectRoleId) return this.$message.error('请选择要分配的角色')
+    const {data:res} = await this.axios.put(`users/${this.userInfo.id}/role`,{rid:this.selectRoleId})
+       if(res.meta.status !== 200) return
+        this.$message.success('更新角色成功')
+        this.getUserList();
+        this.setRoleDialogVisible=false
+
       }
+     
+   
     },
 }
 </script>
