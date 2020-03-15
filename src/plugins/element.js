@@ -2,7 +2,8 @@ import Vue from 'vue'
 // eslint-disable-next-line import/no-duplicates
 import { Button, Form, FormItem, Input, Container, Header, Aside, Main, Menu,
 Submenu, MenuItemGroup, MenuItem, Breadcrumb, BreadcrumbItem, Card, Row, Col,
-Table, TableColumn, Switch, Pagination, Dialog, MessageBox, Tag, Tree, Select, Option} from 'element-ui'
+Table, TableColumn, Switch, Pagination, Dialog, MessageBox, Tag, Tree, Select,
+ Option, Cascader} from 'element-ui'
 
 // 导入消息弹出框组件
 // eslint-disable-next-line import/no-duplicates
@@ -33,6 +34,8 @@ Vue.use(Tag)
 Vue.use(Tree)
 Vue.use(Select)
 Vue.use(Option)
+Vue.use(Cascader)
+
 
     // 挂载到全局Vue原型对象
 Vue.prototype.$message = Message

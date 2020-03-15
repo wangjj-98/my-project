@@ -17,3 +17,9 @@ body,
 .el-pagination {
     margin-top: 5px;
 }
+.el-cascader__dropdown {
+    height: 300px;
+}
+.el-cascader-panel {
+    height: 300px;
+}
